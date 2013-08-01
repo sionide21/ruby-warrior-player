@@ -35,12 +35,19 @@ class Vlad
   def should_fight?
     warrior.feel.enemy?
   end
+
   def should_heal?
     hurt?
   end
 
+  def should_rescue?
+    warrior.feel.captive?
+  end
+
   def act!
     case
+    when should_rescue?
+      warrior.rescue!
     when should_fight?
       warrior.attack!
     when should_heal?
