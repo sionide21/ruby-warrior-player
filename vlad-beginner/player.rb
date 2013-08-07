@@ -3,15 +3,10 @@ class Player
 
   def initialize
     @old_health = 20
-    @backward = true
   end
 
   def under_attack?
     warrior.health < old_health
-  end
-
-  def backward?
-    @backward &&= !warrior.feel(:backward).wall?
   end
 
   def play_turn(warrior)
@@ -19,10 +14,8 @@ class Player
     case
     when under_attack?
       vlad = DangerVald
-    when backward?
-      vlad = Vlad
     else
-      vlad = Vlad
+      vlad = ArcherVlad
     end
     vlad.new(warrior).act!
     @old_health = warrior.health
@@ -70,6 +63,10 @@ class Vlad
     warrior.feel.wall?
   end
 
+  def attack!
+    warrior.attack! direction
+  end
+
   def act!
     case
     when should_turn?
@@ -79,12 +76,23 @@ class Vlad
     when should_rescue?
       warrior.rescue! direction
     when should_fight?
-      warrior.attack! direction
+      attack!
     when should_heal?
       warrior.rest!
     else
       warrior.walk! direction
     end
+  end
+end
+
+
+class ArcherVlad < Vlad
+  def attack!
+    warrior.shoot! direction
+  end
+
+  def should_fight?
+    warrior.look.take_while{|s| not s.captive?}.map(&:enemy?).any?
   end
 end
 
@@ -94,14 +102,5 @@ class DangerVald < Vlad
   end
   def should_retreat?
     warrior.health < 10
-  end
-end
-
-class BackwardsVlad < Vlad
-  def direction
-    :backward
-  end
-  def backward
-    :forward
   end
 end
