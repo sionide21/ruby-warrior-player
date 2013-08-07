@@ -20,7 +20,7 @@ class Player
     when under_attack?
       vlad = DangerVald
     when backward?
-      vlad = BackwardsVlad
+      vlad = Vlad
     else
       vlad = Vlad
     end
@@ -66,8 +66,14 @@ class Vlad
     false
   end
 
+  def should_turn?
+    warrior.feel.wall?
+  end
+
   def act!
     case
+    when should_turn?
+      warrior.pivot!
     when should_retreat?
       warrior.walk! backward
     when should_rescue?
