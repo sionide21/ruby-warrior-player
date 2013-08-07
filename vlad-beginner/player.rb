@@ -60,7 +60,7 @@ class Vlad
   end
 
   def should_turn?
-    warrior.feel.wall?
+    warrior.feel.wall? or warrior.look(backward).map(&:captive?).any?
   end
 
   def attack!
