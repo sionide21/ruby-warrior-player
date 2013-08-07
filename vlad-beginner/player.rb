@@ -87,16 +87,22 @@ end
 
 
 class ArcherVlad < Vlad
+  def direction
+    @direction or super
+  end
+
   def attack!
     warrior.shoot! direction
   end
 
   def should_fight?
-    warrior.look.take_while{|s| not s.captive?}.map(&:enemy?).any?
+    @direction ||= [backward, direction].select do |d|
+      warrior.look(d).take_while{|s| not s.captive?}.map(&:enemy?).any?
+    end.first
   end
 end
 
-class DangerVald < Vlad
+class DangerVald < ArcherVlad
   def should_heal?
     false
   end
